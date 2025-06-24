@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackMaxx AI Report</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebase.js" defer></script>
+  <script src="script.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="report.js" defer></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #111, #333);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .report-container {
+      max-width: 800px;
+      margin: auto;
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #report-output {
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      color: #eee;
+      border: 1px solid #444;
+    }
+
+    #loading-text {
+      text-align: center;
+      font-style: italic;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    <h1>📋 AI Weekly Report</h1>
+    <p id="loading-text">Generating your AI-powered summary...</p>
+    <div id="report-output" style="display: none;"></div>
+  </div>
+  <div style="text-align: center; margin-top: 30px;">
+    <button onclick="window.location.href='dashboard.html'" style="margin: 0 10px; padding: 10px 20px; background: #3498db; color: #fff; border: none; border-radius: 5px; cursor: pointer;">⬅️ Back to Dashboard</button>
+    <button onclick="logoutUser()" style="margin: 0 10px; padding: 10px 20px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; cursor: pointer;">🚪 Logout</button>
+  </div>
+
+  <script>
+    firebase.auth().onAuthStateChanged(async user => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      const db = firebase.firestore();
+      const tasksRef = db.collection("users").doc(user.uid);
+      const doc = await tasksRef.get();
+
+      if (doc.exists) {
+        const data = doc.data();
+        let completed = Object.values(data).filter(val => val === true).length;
+        let total = Object.values(data).length;
+        let percent = Math.round((completed / total) * 100);
+        let summary = `**Weekly Summary for ${user.email}**\n\n`;
+        summary += `✅ Tasks completed: ${completed} / ${total}\n`;
+        summary += `📈 Completion rate: ${percent}%\n\n`;
+
+        summary += `### 🔍 Breakdown by Category\n`;
+        const categories = {};
+
+        for (let key in data) {
+          if (!key.includes("_")) continue;
+          const [cat, task] = key.split("_");
+          if (!categories[cat]) categories[cat] = { total: 0, done: 0 };
+          categories[cat].total++;
+          if (data[key] === true) categories[cat].done++;
+        }
+
+        for (let cat in categories) {
+          const { total, done } = categories[cat];
+          summary += `- **${cat.toUpperCase()}**: ${done}/${total} ✅\n`;
+        }
+
+        summary += `\n---\n\n`;
+        if (percent >= 80) {
+          summary += `🔥 Excellent work this week! Keep the momentum going.`;
+        } else if (percent >= 50) {
+          summary += `⚠️ You're halfway there — let's push harder next week.`;
+        } else {
+          summary += `📉 Time to reset and rebuild. You’ve got this!`;
+        }
+
+        document.getElementById("loading-text").style.display = "none";
+        document.getElementById("report-output").style.display = "block";
+        document.getElementById("report-output").innerHTML = marked.parse(summary);
+      }
+    });
+  </script>
+</body>
+</html>

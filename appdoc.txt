@@ -1,0 +1,8 @@
+📁 trackmaxx-app/
+├── index.html         ← login page
+├── dashboard.html     ← task tracker
+├── report.html        ← AI progress report
+├── style.css
+├── script.js
+├── firebase.js        ← Firebase config & functions
+└── reset.js           ← Weekly reset handler

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard – TrackMaxx</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebase.js" defer></script>
+  <script src="script.js" defer></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #111, #333);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .dashboard-container {
+      max-width: 1000px;
+      margin: auto;
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .user-report {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 20px;
+    }
+
+    .user-report h2 {
+      margin: 0 0 10px;
+    }
+
+    .logout-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .logout-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body onload="loadAdminDashboard()">
+  <div class="dashboard-container">
+    <h1>🛠️ Admin Panel – TrackMaxx</h1>
+    <p>Viewing all user progress summaries:</p>
+    <div id="user-stats"></div>
+        <button class="logout-btn" onclick="logoutUser()">🚪 Logout</button>
+  </div>
+</body>
+</html>
